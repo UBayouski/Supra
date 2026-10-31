@@ -1,0 +1,19 @@
+# Separate Supra repository: keep this file at the repository root.
+# Channel archives are stored in the operator's browser; no server disk is needed.
+services:
+  - type: web
+    name: while-you-were-afk
+    runtime: node
+    plan: free
+    numInstances: 1
+    buildCommand: npm test && npm run check
+    startCommand: node server.mjs
+    healthCheckPath: /health
+    autoDeployTrigger: "off"
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      - key: TWITCH_CLIENT_ID
+        sync: false

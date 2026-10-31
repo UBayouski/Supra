@@ -1,0 +1,12 @@
+{
+  "name": "while-you-were-afk",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.mjs",
+    "test": "node --test --test-isolation=none",
+    "check": "node --check server.mjs && node --check workspace.mjs && node --check snapshots.mjs && node --check store.mjs && node --check model.mjs && node --check twitch.mjs && node --check public/app.js && node --check public/channel-storage.js && node --check public/overlay.js"
+  },
+  "engines": { "node": ">=24.18.0" }
+}
