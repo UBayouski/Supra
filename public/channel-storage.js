@@ -13,6 +13,7 @@ export function readChannel(channelId, storage = localStorage) {
 export function saveChannel(data, storage = localStorage) {
   // Never replace a browser backup with the empty workspace returned before hydration.
   if (!data.authenticated || data.needsRestore || !data.backup) return;
-  const key = prefix + data.channelId, serialized = JSON.stringify(data.backup);
+  const key = prefix + data.channelId,
+    serialized = JSON.stringify(data.backup);
   if (storage.getItem(key) !== serialized) storage.setItem(key, serialized);
 }

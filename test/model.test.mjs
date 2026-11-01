@@ -1,20 +1,50 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { active, addEvent, applyChat, initialState, loadDemo, moderate, newSession, nominate, parseCommand, recap } from '../model.mjs';
+import {
+  active,
+  addEvent,
+  applyChat,
+  initialState,
+  loadDemo,
+  moderate,
+  newSession,
+  nominate,
+  parseCommand,
+  recap,
+} from '../model.mjs';
 
 function chat(message, moderator = false) {
-  return { message: { text: message }, chatter_user_id: 'viewer-1', chatter_user_name: 'Viewer',
-    broadcaster_user_id: 'streamer-1', badges: moderator ? [{ set_id: 'moderator' }] : [] };
+  return {
+    message: { text: message },
+    chatter_user_id: 'viewer-1',
+    chatter_user_name: 'Viewer',
+    broadcaster_user_id: 'streamer-1',
+    badges: moderator ? [{ set_id: 'moderator' }] : [],
+  };
 }
 test('commands require exact names and their expected arguments', () => {
-  assert.deepEqual(parseCommand(' !GOAL Reach the summit '), { command: 'goal', argument: 'Reach the summit' });
-  for (const input of ['!goals nope', 'hello !catchup', '!catchup now', '!goal', '!moment   ', '!approve']) assert.equal(parseCommand(input), null);
+  assert.deepEqual(parseCommand(' !GOAL Reach the summit '), {
+    command: 'goal',
+    argument: 'Reach the summit',
+  });
+  for (const input of [
+    '!goals nope',
+    'hello !catchup',
+    '!catchup now',
+    '!goal',
+    '!moment   ',
+    '!approve',
+  ])
+    assert.equal(parseCommand(input), null);
   assert.equal(parseCommand('!catchup').command, 'catchup');
 });
 test('unapproved viewer text cannot enter the recap', () => {
   const session = newSession('A stream', 0);
   assert.equal(applyChat(session, chat('!goal Unauthorized goal'), 1000), null);
-  assert.equal(applyChat(session, { ...chat('!rule No rules'), badges: [{ set_id: 'vip' }] }, 1000), null);
+  assert.equal(
+    applyChat(session, { ...chat('!rule No rules'), badges: [{ set_id: 'vip' }] }, 1000),
+    null,
+  );
   applyChat(session, chat('!moment A nominated highlight'), 2000);
   assert.equal(session.events.length, 0);
   assert.equal(recap(session).sources.length, 0);
@@ -70,7 +100,8 @@ test('recap uses latest approved entry per type, with traceable source IDs', () 
   assert.equal(session.catchupRequests, 1);
 });
 test('demo creates a separate session without overwriting a real stream', () => {
-  const state = initialState(), original = active(state);
+  const state = initialState(),
+    original = active(state);
   addEvent(original, { type: 'goal', text: 'Real stream' });
   loadDemo(state);
   assert.equal(state.sessions.length, 2);

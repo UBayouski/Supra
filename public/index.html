@@ -1,87 +1,291 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Give late arrivals the story so far. A live stream timeline, community nominations, and a catch-up card for Twitch.">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Give late arrivals the story so far. A live stream timeline, community nominations, and a catch-up card for Twitch."
+    />
     <title>While You Were AFK · Studio</title>
-    <meta name="theme-color" content="#202437">
-    <link rel="icon" href="/favicon.svg?v=3" type="image/svg+xml" sizes="any">
-    <link rel="stylesheet" href="/style.css">
+    <meta name="theme-color" content="#202437" />
+    <link rel="icon" href="/favicon.svg?v=3" type="image/svg+xml" sizes="any" />
+    <link rel="stylesheet" href="/style.css" />
   </head>
   <body>
     <aside class="sidebar">
-      <a class="brand" href="/" aria-label="While You Were AFK home"><span class="brand-mark">↶</span><span class="brand-name">While you<span class="brand-sub">WERE AFK</span></span></a>
+      <a class="brand" href="/" aria-label="While You Were AFK home"
+        ><span class="brand-mark">↶</span
+        ><span class="brand-name">While you<span class="brand-sub">WERE AFK</span></span></a
+      >
       <div class="workspace-label">YOUR STUDIO <span>01</span></div>
       <nav aria-label="Timeline filters">
-        <button class="nav-item selected" data-filter="all"><span>▤</span> Stream timeline <b id="total-count">0</b></button>
+        <button class="nav-item selected" data-filter="all">
+          <span>▤</span> Stream timeline <b id="total-count">0</b>
+        </button>
         <button class="nav-item" data-filter="goal"><span>◎</span> Goals</button>
         <button class="nav-item" data-filter="milestone"><span>⚑</span> Milestones</button>
         <button class="nav-item" data-filter="joke"><span>✳</span> Inside jokes</button>
         <button class="nav-item" data-filter="rule"><span>◇</span> Stream rules</button>
       </nav>
       <div class="sidebar-bottom">
-        <div class="sidebar-note"><span class="little-star">✳</span><p>Every stream has a story.<br>Let everyone in on it.</p></div>
+        <div class="sidebar-note">
+          <span class="little-star">✳</span>
+          <p>Every stream has a story.<br />Let everyone in on it.</p>
+        </div>
         <button id="show-commands" class="nav-item"><span>⌘</span> Chat commands</button>
         <a href="/api/export" class="nav-item"><span>↓</span> Export your streams</a>
-        <div class="local-indicator"><i></i> <span id="storage-status">Private demo · connect to save</span></div>
+        <div class="local-indicator">
+          <i></i> <span id="storage-status">Private demo · connect to save</span>
+        </div>
       </div>
     </aside>
 
     <div class="studio">
       <header class="topbar">
         <div class="breadcrumb">Studio <span>/</span> The story so far</div>
-        <div class="topbar-actions"><span id="connection" class="connection"><i></i><span>Local studio</span></span><button id="reconnect" class="button secondary small" hidden>Reconnect Twitch</button><button id="connect" class="button twitch">Connect Twitch ↗</button></div>
+        <div class="topbar-actions">
+          <span id="connection" class="connection"><i></i><span>Local studio</span></span
+          ><button id="reconnect" class="button secondary small" hidden>Reconnect Twitch</button
+          ><button id="connect" class="button twitch">Connect Twitch ↗</button>
+        </div>
       </header>
       <main>
         <section class="page-heading">
-          <div><p class="eyebrow">FOR EVERY “WHAT DID I MISS?”</p><h1>The story so far<span>.</span></h1><p class="subtitle">Turn a great stream into a story everyone can follow.</p></div>
+          <div>
+            <p class="eyebrow">FOR EVERY “WHAT DID I MISS?”</p>
+            <h1>The story so far<span>.</span></h1>
+            <p class="subtitle">Turn a great stream into a story everyone can follow.</p>
+          </div>
           <button id="new-stream" class="button secondary">＋ New stream</button>
         </section>
         <section class="session-bar" aria-label="Current stream">
-          <div class="session-main"><span id="session-badge" class="session-badge">STUDIO</span><div><h2 id="session-title">Untitled stream</h2><span id="session-age" class="muted">A new story starts here</span></div></div>
-          <div class="session-tools"><label class="sr-only" for="sessions">Saved streams</label><select id="sessions" aria-label="Saved streams"></select><button id="rename" class="icon-button" title="Rename stream" aria-label="Rename stream">✎</button></div>
+          <div class="session-main">
+            <span id="session-badge" class="session-badge">STUDIO</span>
+            <div>
+              <h2 id="session-title">Untitled stream</h2>
+              <span id="session-age" class="muted">A new story starts here</span>
+            </div>
+          </div>
+          <div class="session-tools">
+            <label class="sr-only" for="sessions">Saved streams</label
+            ><select id="sessions" aria-label="Saved streams"></select
+            ><button
+              id="rename"
+              class="icon-button"
+              title="Rename stream"
+              aria-label="Rename stream"
+            >
+              ✎
+            </button>
+          </div>
         </section>
         <div class="columns">
           <div class="story-column">
             <section class="goal-card">
-              <div class="goal-icon">◎</div><div><p class="eyebrow">THE CURRENT MISSION</p><h2 id="current-goal">What's the goal today?</h2><p id="goal-hint">Add a goal so new viewers know what we're working toward.</p></div><span class="goal-line" aria-hidden="true">↗</span>
+              <div class="goal-icon">◎</div>
+              <div>
+                <p class="eyebrow">THE CURRENT MISSION</p>
+                <h2 id="current-goal">What's the goal today?</h2>
+                <p id="goal-hint">Add a goal so new viewers know what we're working toward.</p>
+              </div>
+              <span class="goal-line" aria-hidden="true">↗</span>
             </section>
             <section class="timeline-section">
-              <div class="section-heading"><h2>Stream timeline <span id="moment-count" class="count">0</span></h2><button id="open-capture" class="button primary small">＋ Add a moment</button></div>
-              <div class="timeline-toolbar"><div class="tabs" role="group" aria-label="Timeline view"><button class="active" data-view="all">All moments</button><button data-view="community">From chat</button></div><label class="search"><span>⌕</span><input id="search" type="search" placeholder="Find a moment…" aria-label="Find a moment"></label></div>
+              <div class="section-heading">
+                <h2>Stream timeline <span id="moment-count" class="count">0</span></h2>
+                <button id="open-capture" class="button primary small">＋ Add a moment</button>
+              </div>
+              <div class="timeline-toolbar">
+                <div class="tabs" role="group" aria-label="Timeline view">
+                  <button class="active" data-view="all">All moments</button
+                  ><button data-view="community">From chat</button>
+                </div>
+                <label class="search"
+                  ><span>⌕</span
+                  ><input
+                    id="search"
+                    type="search"
+                    placeholder="Find a moment…"
+                    aria-label="Find a moment"
+                /></label>
+              </div>
               <div id="timeline" class="timeline" aria-live="polite"></div>
             </section>
             <section class="demo-console">
-              <div><span class="console-dot"></span><strong>Try it without going live</strong><span class="muted">A little story, ready to explore.</span></div>
+              <div>
+                <span class="console-dot"></span><strong>Try it without going live</strong
+                ><span class="muted">A little story, ready to explore.</span>
+              </div>
               <button id="load-demo" class="text-button">Load demo stream ↗</button>
-              <form id="simulate-form" hidden><label class="sr-only" for="simulate">Simulate a Twitch command</label><input id="simulate" placeholder="!moment That last jump deserves a name" maxlength="300" required><label class="demo-role"><input id="demo-moderator" type="checkbox"> Moderator</label><button class="button secondary small">Send</button></form>
+              <form id="simulate-form" hidden>
+                <label class="sr-only" for="simulate">Simulate a Twitch command</label
+                ><input
+                  id="simulate"
+                  placeholder="!moment That last jump deserves a name"
+                  maxlength="300"
+                  required
+                /><label class="demo-role"
+                  ><input id="demo-moderator" type="checkbox" /> Moderator</label
+                ><button class="button secondary small">Send</button>
+              </form>
             </section>
           </div>
           <aside class="context-column">
             <section class="recap-card">
-              <div class="recap-heading"><span class="eyebrow">THE NEW-VIEWER EDITION</span><span class="live-label"><i></i> LIVE PREVIEW</span></div>
-              <div class="recap-title"><span>↶</span><h2>While you<br>were AFK.</h2></div>
+              <div class="recap-heading">
+                <span class="eyebrow">THE NEW-VIEWER EDITION</span
+                ><span class="live-label"><i></i> LIVE PREVIEW</span>
+              </div>
+              <div class="recap-title">
+                <span>↶</span>
+                <h2>While you<br />were AFK.</h2>
+              </div>
               <p class="recap-intro">Just got here? You're right on time.</p>
               <div id="recap-content"></div>
-              <div class="recap-bottom"><code>!catchup</code><span>One command. All caught up.</span></div>
+              <div class="recap-bottom">
+                <code>!catchup</code><span>One command. All caught up.</span>
+              </div>
             </section>
-            <div class="preview-actions"><button id="copy-recap" class="button secondary small">Copy catch-up</button><button id="copy-overlay" class="button secondary small">Copy OBS URL</button><a id="obs-overlay" href="/overlay" target="_blank" rel="noopener" class="button secondary small">OBS overlay ↗</a></div>
-            <section class="reply-settings"><label class="toggle-label"><input id="replies" type="checkbox"><span>Reply to <code>!catchup</code> in Twitch</span></label><p>Off until you enable it. Uses your connected account; one reply per 15 seconds.</p><div id="catchup-activity" class="activity">Waiting for the first “what did I miss?”</div></section>
-            <section class="queue-section"><div class="section-heading"><h2>From the community <span id="queue-count" class="count">0</span></h2><span class="queue-label">REVIEW QUEUE</span></div><p class="queue-description">Chat spots the moments. You choose the story.</p><div id="queue"></div></section>
+            <div class="preview-actions">
+              <button id="copy-recap" class="button secondary small">Copy catch-up</button
+              ><button id="copy-overlay" class="button secondary small">Copy OBS URL</button
+              ><a
+                id="obs-overlay"
+                href="/overlay"
+                target="_blank"
+                rel="noopener"
+                class="button secondary small"
+                >OBS overlay ↗</a
+              >
+            </div>
+            <section class="reply-settings">
+              <label class="toggle-label"
+                ><input id="replies" type="checkbox" /><span
+                  >Reply to <code>!catchup</code> in Twitch</span
+                ></label
+              >
+              <p>Off until you enable it. Uses your connected account; one reply per 15 seconds.</p>
+              <div id="catchup-activity" class="activity">
+                Waiting for the first “what did I miss?”
+              </div>
+            </section>
+            <section class="queue-section">
+              <div class="section-heading">
+                <h2>From the community <span id="queue-count" class="count">0</span></h2>
+                <span class="queue-label">REVIEW QUEUE</span>
+              </div>
+              <p class="queue-description">Chat spots the moments. You choose the story.</p>
+              <div id="queue"></div>
+            </section>
             <div class="trust-note">◇ Only approved moments make the catch-up.</div>
           </aside>
         </div>
-        <footer><span>MADE FOR THE MOMENTS BETWEEN “HELLO” AND “YOU HAD TO BE THERE.”</span><span>WHILE YOU WERE AFK / 01</span></footer>
+        <footer>
+          <span>MADE FOR THE MOMENTS BETWEEN “HELLO” AND “YOU HAD TO BE THERE.”</span
+          ><span>WHILE YOU WERE AFK / 01</span>
+        </footer>
       </main>
     </div>
 
     <dialog id="capture-dialog">
-      <form id="capture-form"><div class="dialog-heading"><div><p class="eyebrow">KEEP THE CONTEXT</p><h2>Add a moment</h2></div><button type="button" class="icon-button close-dialog" aria-label="Close">×</button></div><label for="moment-type">What kind of moment?</label><select id="moment-type"><option value="milestone">⚑ Milestone</option><option value="goal">◎ Goal</option><option value="joke">✳ Inside joke</option><option value="rule">◇ Stream rule</option></select><label for="moment-text">What should a new viewer know?</label><textarea id="moment-text" maxlength="240" rows="4" placeholder="We finally cleared the wind tunnel on attempt 12." required></textarea><p class="field-hint">Keep it short and understandable without the backstory.</p><button class="button primary">Add to the story ↗</button></form>
+      <form id="capture-form">
+        <div class="dialog-heading">
+          <div>
+            <p class="eyebrow">KEEP THE CONTEXT</p>
+            <h2>Add a moment</h2>
+          </div>
+          <button type="button" class="icon-button close-dialog" aria-label="Close">×</button>
+        </div>
+        <label for="moment-type">What kind of moment?</label
+        ><select id="moment-type">
+          <option value="milestone">⚑ Milestone</option>
+          <option value="goal">◎ Goal</option>
+          <option value="joke">✳ Inside joke</option>
+          <option value="rule">◇ Stream rule</option></select
+        ><label for="moment-text">What should a new viewer know?</label
+        ><textarea
+          id="moment-text"
+          maxlength="240"
+          rows="4"
+          placeholder="We finally cleared the wind tunnel on attempt 12."
+          required
+        ></textarea>
+        <p class="field-hint">Keep it short and understandable without the backstory.</p>
+        <button class="button primary">Add to the story ↗</button>
+      </form>
     </dialog>
-    <dialog id="session-dialog"><form id="session-form"><div class="dialog-heading"><div><p class="eyebrow">A FRESH CHAPTER</p><h2 id="session-dialog-title">Start a new stream</h2></div><button type="button" class="icon-button close-dialog" aria-label="Close">×</button></div><label for="stream-title">Give this stream a name</label><input id="stream-title" maxlength="100" placeholder="One run. No shortcuts." required><p class="field-hint">Previous streams stay in your archive.</p><button class="button primary" id="save-session">Start the story ↗</button></form></dialog>
-    <dialog id="commands-dialog"><div class="dialog-heading"><div><p class="eyebrow">YOUR CHAT, IN THE LOOP</p><h2>Small commands.<br>Shared context.</h2></div><button class="icon-button close-dialog" aria-label="Close">×</button></div><div class="command-list"><div><code>!catchup</code><p>Anyone: show the story so far in the studio and overlay. Sends a chat reply only when enabled.</p></div><div><code>!moment [text]</code><p>Anyone: nominate a moment for moderator review.</p></div><div><code>!goal [text]</code><code>!milestone [text]</code><code>!joke [text]</code><code>!rule [text]</code><p>Broadcaster or moderators: add directly to the timeline.</p></div><div><code>!approve [id] [type]</code><code>!reject [id]</code><p>Broadcaster or moderators: review a nomination using its displayed ID. Type defaults to milestone.</p></div></div></dialog>
-    <dialog id="setup-dialog"><div class="dialog-heading"><h2>Connect your channel</h2><button class="icon-button close-dialog" aria-label="Close">×</button></div><p>Create or update a Twitch application with this exact OAuth redirect URL:</p><code id="redirect-url" class="setup-code"></code><p>Connect your broadcaster account to open its saved studio. Each channel has its own streams and OBS overlay.</p><label class="toggle-label"><input id="request-write" type="checkbox"><span>Also request permission for optional catch-up replies</span></label><p class="field-hint">Reading chat is enough for the timeline and overlay. Sending replies requires chat write permission.</p><button id="authorize" class="button twitch">Continue to Twitch ↗</button></dialog>
+    <dialog id="session-dialog">
+      <form id="session-form">
+        <div class="dialog-heading">
+          <div>
+            <p class="eyebrow">A FRESH CHAPTER</p>
+            <h2 id="session-dialog-title">Start a new stream</h2>
+          </div>
+          <button type="button" class="icon-button close-dialog" aria-label="Close">×</button>
+        </div>
+        <label for="stream-title">Give this stream a name</label
+        ><input id="stream-title" maxlength="100" placeholder="One run. No shortcuts." required />
+        <p class="field-hint">Previous streams stay in your archive.</p>
+        <button class="button primary" id="save-session">Start the story ↗</button>
+      </form>
+    </dialog>
+    <dialog id="commands-dialog">
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">YOUR CHAT, IN THE LOOP</p>
+          <h2>Small commands.<br />Shared context.</h2>
+        </div>
+        <button class="icon-button close-dialog" aria-label="Close">×</button>
+      </div>
+      <div class="command-list">
+        <div>
+          <code>!catchup</code>
+          <p>
+            Anyone: show the story so far in the studio and overlay. Sends a chat reply only when
+            enabled.
+          </p>
+        </div>
+        <div>
+          <code>!moment [text]</code>
+          <p>Anyone: nominate a moment for moderator review.</p>
+        </div>
+        <div>
+          <code>!goal [text]</code><code>!milestone [text]</code><code>!joke [text]</code
+          ><code>!rule [text]</code>
+          <p>Broadcaster or moderators: add directly to the timeline.</p>
+        </div>
+        <div>
+          <code>!approve [id] [type]</code><code>!reject [id]</code>
+          <p>
+            Broadcaster or moderators: review a nomination using its displayed ID. Type defaults to
+            milestone.
+          </p>
+        </div>
+      </div>
+    </dialog>
+    <dialog id="setup-dialog">
+      <div class="dialog-heading">
+        <h2>Connect your channel</h2>
+        <button class="icon-button close-dialog" aria-label="Close">×</button>
+      </div>
+      <p>Create or update a Twitch application with this exact OAuth redirect URL:</p>
+      <code id="redirect-url" class="setup-code"></code>
+      <p>
+        Connect your broadcaster account to open its saved studio. Each channel has its own streams
+        and OBS overlay.
+      </p>
+      <label class="toggle-label"
+        ><input id="request-write" type="checkbox" /><span
+          >Also request permission for optional catch-up replies</span
+        ></label
+      >
+      <p class="field-hint">
+        Reading chat is enough for the timeline and overlay. Sending replies requires chat write
+        permission.
+      </p>
+      <button id="authorize" class="button twitch">Continue to Twitch ↗</button>
+    </dialog>
     <div id="toast" class="toast" role="status" hidden></div>
     <script type="module" src="/app.js"></script>
   </body>
