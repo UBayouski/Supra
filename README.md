@@ -1,106 +1,113 @@
-# While You Were AFK
+﻿# While You Were AFK
 
 **Back in chat. Back in the story.**
 
-Submission materials: [demo video scenario](DEMO_VIDEO.md) and [hackathon readiness checklist](HACKATHON_CHECKLIST.md). The studio, OBS overlay, and submission use **While You Were AFK**.
+While You Were AFK helps late arrivals catch up with a Twitch stream. Broadcasters and moderators save the current goal, milestones, rules, and inside jokes. Viewers nominate moments for review, and newcomers type `!catchup` to get the approved story so far.
 
-A Twitch studio that keeps the story of a stream: the current goal, the latest milestone, the rules, and the joke everyone keeps repeating. Moderators publish context; viewers nominate moments; newcomers type `!catchup` to get the approved story so far.
+[Open While You Were AFK](https://supra-syrd.onrender.com/)
 
-## Run
+## Features
 
-Requires **Node.js 24.18.0 or newer**. No package installation or AI API key is required.
+- **A live stream timeline.** Keep important context in one place, with timestamps and contributor credit.
+- **Community nominations.** Viewers suggest moments through Twitch chat; the broadcaster or a moderator decides what becomes part of the recap.
+- **An approved catch-up.** The recap selects the latest approved goal, milestone, rule, and inside joke. Pending and rejected suggestions stay out.
+- **Optional Twitch replies.** Send the recap back into chat when a viewer asks for `!catchup`.
+- **An OBS overlay.** Display approved context through a read-only Browser Source URL, separate from studio controls.
+- **Browser-saved archives.** Save real-channel streams in the browser and restore them after verified Twitch login.
+- **A standalone demo.** Explore a populated stream and simulate commands without connecting Twitch.
 
-```powershell
-cd D:\Projects\Twitch\supra
+## Run locally
+
+Requires **Node.js 24.18.0 or newer**. No package installation, database, or runtime AI API key is required.
+
+From the repository root:
+
+```sh
 npm start
 ```
 
-Open **http://localhost:3001**. Boss can keep running on port 3000. Use `localhost`, not `127.0.0.1`, because the origin must match the OAuth redirect.
+Open **http://localhost:3001**. Select **Load demo stream** to explore the timeline, recap, and moderation queue.
 
-Click **Load demo stream** to explore a populated timeline, catch-up card, and moderation queue. The demo is private to your browser session and stays in memory. It does not overwrite your real streams or send anything to Twitch. Connect your broadcaster account to open its studio and save real streams in this browser.
+To try the review flow, send `!moment The spoon saved the run` in the demo command box with **Moderator** unchecked. Find it in the queue, choose **Inside joke**, and select **Keep**. The timeline and recap update together. Demo commands never send Twitch messages, and demo data stays separate from real channels.
 
-## Try the full flow locally
+## Connect Twitch
 
-1. Load the demo. Read the mission and the catch-up card.
-2. In the demo command box below the timeline, send `!moment The spoon saved the run` with Moderator unchecked.
-3. The nomination appears in the community queue, but not in the catch-up card.
-4. Choose **Inside joke**, then **Keep**. The approved moment enters the timeline and catch-up with its original timestamp and contributor credit.
-5. Send `!catchup`. The request activity updates; no Twitch message is sent in the demo.
-6. Click a timestamp in the catch-up card to jump to the original timeline entry.
-7. Open **OBS overlay** and approve another nomination. Both views update live.
-8. Start a **New stream**. Previous demo streams remain in this browser session. Reload to verify the active session; demo workspaces reset on server restart. Connected channel streams are saved in browser localStorage and restored after verified Twitch login.
+The hosted app provides **Connect Twitch** for your broadcaster account. To configure your own local instance:
 
-## Connect real Twitch chat
+1. Register a Twitch application in the [Twitch developer console](https://dev.twitch.tv/console/apps).
+2. Register the exact OAuth redirect **http://localhost:3001**, without a trailing slash.
+3. Copy `.env.example` to `.env` and set your application's Client ID:
 
-1. Register a separate Twitch application for **While You Were AFK** at [Twitch's developer console](https://dev.twitch.tv/console/apps). The account needs verified email and two-factor authentication. Twitch requires each application to have its own Client ID; keep Boss by Chat's registration separate.
-2. Add this exact OAuth redirect URL: **http://localhost:3001**.
-3. Copy `.env.example` to `.env` and set `TWITCH_CLIENT_ID` to your app's Client ID. No client secret is used.
-4. Restart the app, click **Connect Twitch**, then **Continue to Twitch**. Authorize the broadcaster account whose channel you want to use. This version supports that account's own channel.
-5. Reading chat is enough for the timeline and overlay. To support replies, select the optional chat reply permission before authorizing. This requests `user:write:chat` in addition to `user:read:chat`.
-6. After connecting, add a goal locally or through a moderator chat command. Connecting opens the verified broadcaster's studio and restores this browser's saved archive before chat starts. Demo content never enters the real catch-up. Another browser can share the live studio while the server is running, but needs its own browser backup after a server restart.
-7. A viewer sends `!moment ...`; approve it in the studio or using a moderator command. Any viewer can then send `!catchup`.
-8. To actually send the catch-up back into Twitch, explicitly enable **Reply to !catchup in Twitch**. Responses are sent as the connected broadcaster, with a channel-wide 15-second cooldown. The default is off; it resets on reconnect, stream changes, or server restart.
+   ```dotenv
+   TWITCH_CLIENT_ID=your_twitch_client_id
+   PORT=3001
+   ```
 
-Tokens stay in memory and disappear on server restart. No token is stored in stream exports or localStorage. After expiry or revoked authorization, reconnect manually; automatic token renewal is not implemented. The adapter handles WebSocket reconnect requests and deduplicates chat message IDs. Twitch cannot replay events missed during an outage. Chat from other channels in a shared-chat session is excluded.
+4. Restart the server, open **http://localhost:3001**, and select **Connect Twitch**. Authorize the broadcaster whose channel you want to use.
+5. To send catch-up replies, request the optional reply permission during authorization, then enable **Reply to !catchup in Twitch** in the studio.
 
-Switching an archived stream pauses live Twitch chat to protect the archive. Use **Reconnect Twitch** to resume. **Disconnect** signs this browser out of the channel and opens a blank private workspace; other signed-in browsers remain connected. To begin a fresh real stream, use **New stream**. Load the demo only while disconnected.
+Reading chat requires `user:read:chat`; optional replies also require `user:write:chat`. Replies are sent as the connected broadcaster, with a channel-wide 15-second cooldown. Replies default to off and reset on reconnect, stream changes, or server restart. No client secret is used.
 
-## Commands
+## Chat commands
 
-| Command | Who | Result |
+| Command | Who can use it | Result |
 | --- | --- | --- |
-| `!catchup` | Anyone | Updates catch-up activity; sends an approved recap into Twitch only when replies are enabled. |
-| `!moment A memorable thing happened` | Anyone | Creates a pending nomination. |
-| `!goal Beat the summit without checkpoints` | Broadcaster / moderators | Sets the latest goal. |
-| `!milestone Attempt 12 reached the final ridge` | Broadcaster / moderators | Publishes a milestone. |
-| `!joke Trust the spoon means chat believes in our lucky charm` | Broadcaster / moderators | Explains an inside joke. |
-| `!rule Every fall means a fresh run` | Broadcaster / moderators | Publishes a rule. |
-| `!approve 1234abcd joke` | Broadcaster / moderators | Approves a nomination using its eight-character ID. Type defaults to `milestone`. |
-| `!reject 1234abcd` | Broadcaster / moderators | Dismisses a pending nomination. |
+| `!catchup` | Anyone | Requests the approved recap; posts a Twitch reply when replies are enabled. |
+| `!moment A memorable thing happened` | Anyone | Adds a nomination to the review queue. |
+| `!goal Beat the summit without checkpoints` | Broadcaster or moderators | Publishes the current goal. |
+| `!milestone We reached the final ridge` | Broadcaster or moderators | Publishes a milestone. |
+| `!rule Every fall means a fresh run` | Broadcaster or moderators | Publishes a stream rule. |
+| `!joke Trust the spoon is our lucky charm` | Broadcaster or moderators | Explains an inside joke. |
+| `!approve 1234abcd joke` | Broadcaster or moderators | Approves a nomination using its eight-character ID and an optional type. |
+| `!reject 1234abcd` | Broadcaster or moderators | Rejects a pending nomination. |
 
-Moderation is determined from Twitch's broadcaster identity and moderator badges. VIP/subscriber badges do not grant publishing permission. The local studio is an operator interface: anyone with access to your computer can publish or approve locally.
+Approval types are `goal`, `milestone`, `rule`, and `joke`; the default is `milestone`. Broadcasters can also add and review moments directly in the studio. VIP and subscriber badges do not grant moderator privileges.
 
-Each viewer can have three pending nominations; duplicate pending text from the same viewer is rejected. The pending queue allows 100 items. A stream supports 1,000 approved moments, and the archive supports 100 sessions. Export before manually managing a full archive; this version has no bulk archive deletion UI.
+Each viewer can have up to three pending nominations. Duplicate pending suggestions from the same viewer are rejected, and unreviewed suggestions never appear in the catch-up or OBS overlay.
 
-## Catch-up and provenance
+## Use with OBS
 
-The catch-up uses the latest approved goal, milestone, rule, and inside joke. It is a deterministic recap, not an AI-generated summary or a transcript of the stream. It does not guess what happened in audio or video. Pending and rejected nominations never appear in it.
+Connect your broadcaster account and select **Copy OBS URL**. Paste the URL into an OBS **Browser Source**; a suggested source size is **500 x 1100**, resized to suit your layout.
 
-Timestamps are relative to when the local stream session was created, not a Twitch VOD timecode. Approving a nomination keeps its original time. Source links in the studio jump to those moments; OBS shows their elapsed times. Removing the latest approved entry restores the previous entry of that type in the recap.
+The URL contains a random read-only key, so OBS can display the recap without sharing the studio's login cookie. It shows approved text and elapsed times, with a transparent page background. It cannot edit streams, approve nominations, or export data.
 
-## OBS
+Keep the studio open while streaming so incoming moments are saved in the browser. After a server restart, reconnect Twitch in that browser to restore the archive and the same OBS URL. The overlay waits and reconnects while the studio is unavailable.
 
-Connect your broadcaster account, click **Copy OBS URL**, and paste the copied URL into an OBS **Browser Source**. The URL looks like `http://localhost:3001/overlay/<random-key>` and works without the studio's browser cookie. The unkeyed `/overlay` is only a preview of the requesting browser's workspace. Suggested source size: **500 × 1100**; resize it in OBS as needed. The page background is transparent, with an opaque catch-up card. This is a persistent story card, not a timed popup.
+## Storage and privacy
 
-The overlay receives only approved recap content. Pending nominations remain in the operator studio. Keep the local server running for live updates. If the connection drops, the overlay shows a reconnection notice and retains the last received recap.
+Real-channel archives are saved in `localStorage`, keyed by the verified Twitch broadcaster ID. Saved data includes streams, moments, nominations, and the read-only overlay key. Twitch tokens and browser login cookies are never included in that archive.
 
-## Data and local access
+Use the same regular browser profile to recover an archive after a restart. Different browsers, profiles, domains, and ports have separate storage. Clearing site data or closing an incognito session removes its saved archives. **Export your streams** downloads an additional archive copy without tokens or the overlay key.
 
-Real-channel archives are saved in `localStorage` under `supra:channel:<verified Twitch ID>`. The browser saves streams, moments, nominations, and the read-only OBS key after updates. The server keeps live state only in memory and writes no stream files. A newly connected channel waits for browser restoration before starting chat; stale backups cannot overwrite a studio already active on that server.
+The server keeps live state only in memory. While it is running, browsers authenticated to the same Twitch account share the active studio; each open studio saves its own browser copy. Different Twitch accounts have separate studios, exports, chat connections, and reply settings. A stale browser backup cannot overwrite a studio already restored on the current server.
 
-After a server restart or redeploy, open the studio in the same browser and reconnect Twitch. Your browser restores the archive and the same OBS URL; replies stay off until enabled again. Keep the studio open during capture so incoming moments are saved. Another browser/device does not automatically have that backup. Different domains, ports, profiles, and private windows have separate storage. Use a regular browser profile for the demo; clearing site data or closing an incognito session deletes its saved archives.
+Guest workspaces are temporary. **Disconnect** signs that browser out of the channel without deleting its saved archive. Switching to an archived stream pauses live chat; use **Reconnect Twitch** to resume.
 
-**Export your streams** downloads the current archive without tokens or the overlay key. Use it as an additional backup. If browser storage is blocked, corrupt, or full, the studio shows a save warning and preserves existing browser data. The current live session can still be exported.
+## How it works
 
-For local migration only, a browser with no saved archive can import matching real sessions from the old `.data/channels/<Twitch ID>/state.json` or `.data/state.json` after verified login. Those files remain untouched; demo and unbound sessions are excluded. Hosted deployments do not load legacy files. Local browser data does not automatically move to the hosted origin.
+The studio uses vanilla JavaScript and CSS, with a dependency-free Node.js server for Twitch authorization, EventSub chat, and live updates to the studio and overlay.
 
-Browser sessions use opaque HttpOnly, SameSite cookies (Secure on HTTPS). Different Twitch accounts have separate live studios, archives, events, exports, and reply settings. Browsers signed into the same account share its currently active studio, and each open studio saves a browser copy. Guest workspaces are temporary. Idle browser sessions expire after six hours.
+Catch-up is deterministic: it selects approved facts rather than generating an AI summary or transcribing the stream. Approval preserves a nomination's original timestamp and contributor credit. Recap source links jump to timeline entries; timestamps are relative to the app's stream session, not Twitch VOD timecodes.
 
-The server listens on loopback by default and checks Host and Origin headers. Hosting enables network binding with a configured HTTPS origin. Use one server process; no database or persistent disk is required. See [deployment instructions](DEPLOYMENT.md) and the [free-plan Render Blueprint](render.yaml). No resources have been provisioned by this configuration.
+## Limitations
 
-Fonts optionally load from Google Fonts and fall back to system fonts. There are no external image assets. No runtime AI service, hosting, or paid service is required.
+- Archives are browser-local and do not automatically sync between devices or between localhost and a hosted domain.
+- Keep the studio open to save incoming chat updates. If browser storage is blocked or full, use the export action to preserve the live archive.
+- Reconnect Twitch after a server restart or expired authorization. Automatic OAuth token renewal and replay of missed chat messages are not implemented.
+- Remote moderators use Twitch commands; moderator access to the broadcaster's web studio is not implemented.
+- The server runs as one process/instance because live channels and overlay access are held in memory.
 
-## Validation
+## Development
 
-```powershell
+```sh
 npm test
 npm run check
 ```
 
-Automated tests cover role enforcement, moderation, nomination limits, original timestamps, recap provenance, browser/channel isolation, browser backups, verified restoration after restart, stale-backup protection, local legacy migration, public-origin checks, read-only overlays, live event isolation, and mocked Twitch authorization/subscriptions/replies/deduplication. The user verified the original real-channel command, nomination, approval, overlay, catch-up reply, and refresh flow. Rehearse the new channel-session flow locally and on the hosted service before recording.
+Tests cover chat roles, moderation, recap provenance, browser storage, verified restoration, stale-backup protection, channel isolation, overlays, and the Twitch adapter.
 
-## Codex build record
+## Deployment
 
-This project was implemented with Codex in session `01a18fbd-49b8-7c81-891e-7a45a6670565`. Codex implemented the local studio, persistent event model, role checks, moderation flow, deterministic recap, OBS overlay, Twitch adapter, and automated tests. This is also the follow-up thread for Boss by Chat; the two applications have separate source folders and run on separate ports.
+The repository includes a free-plan Render Blueprint, runtime pin, and `/health` endpoint. Deploy it as a Node Web Service, set `TWITCH_CLIENT_ID`, and register the hosted HTTPS origin as the Twitch OAuth redirect. No database or persistent disk is required.
 
-Twitch references: [receiving and sending messages](https://dev.twitch.tv/docs/chat/send-receive-messages/), [EventSub chat messages](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchatmessage), and [OAuth scopes](https://dev.twitch.tv/docs/authentication/scopes/).
+See [DEPLOYMENT.md](DEPLOYMENT.md) for configuration and hosting details.

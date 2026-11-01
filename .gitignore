@@ -1,6 +1,5 @@
 .env
 .data/
 node_modules/
-DEMO_VIDEO.md
+hackathon/
 DEPLOYMENT.md
-HACKATHON_CHECKLIST.md
